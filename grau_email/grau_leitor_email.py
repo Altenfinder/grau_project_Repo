@@ -16,127 +16,177 @@ import os
 import email.utils
 import time
 import datetime
+class grau_leitor_email:
+    @staticmethod
+    def leitor_email():
+        email = 'rafael.chow@graugestao.com.br'
+        password    = "007J@mes"
+        smtp_server = "imap.gmail.com"
+        smtp_port   = 993
 
-def leitor_email():
-    email  = 'rafael.chow@graugestao.com.br'
-    password    = "007J@mes"
-    smtp_server = "imap.gmail.com"
-    smtp_port   = 993
+        mail = imaplib.IMAP4_SSL(smtp_server)
+        mail.login(email,password)
+        mail.select('inbox')
 
-    mail = imaplib.IMAP4_SSL(smtp_server)
-    mail.login(email,password)
-    mail.select('inbox')
+        type, data = mail.search(None, 'ALL')
+        mail_ids = data[0]
 
-    type, data = mail.search(None, 'ALL')
-    mail_ids = data[0]
+        id_list = mail_ids.split()
+        first_email_id = int(id_list[0])
+        latest_email_id = int(id_list[-1])
 
-    id_list = mail_ids.split()
-    first_email_id = int(id_list[0])
-    latest_email_id = int(id_list[-1])
+        for i in range(latest_email_id, first_email_id, -1):
+                typ, data = mail.fetch(i, '(RFC822)' )
+                #typ, data = mail.uid('search', None, 'HEADER Subject "C/C CARTEIRAS"' )
 
-    for i in range(latest_email_id, first_email_id, -1):
-            typ, data = mail.fetch(i, '(RFC822)' )
-            #typ, data = mail.uid('search', None, 'HEADER Subject "C/C CARTEIRAS"' )
+                for response_part in data:
+                    if isinstance(response_part, tuple):
+                        msg = message_from_string(response_part[1])
 
-            for response_part in data:
-                if isinstance(response_part, tuple):
-                    msg = message_from_string(response_part[1])
+                        #print msg
+                        email_subject = msg['subject'].decode('utf-8')
+                        email_from = msg['from']
+                        email_att = msg['attachment']
 
-                    #print msg
-                    email_subject = msg['subject'].decode('utf-8')
-                    email_from = msg['from']
-                    email_att = msg['attachment']
+                        print 'From : ' + email_from + '\n'
+                        print 'Subject : ' + email_subject + '\n'
 
-                    print 'From : ' + email_from + '\n'
-                    print 'Subject : ' + email_subject + '\n'
-
-                    if email_att == None:
-                        pass
-                    else:
-                        print 'Attachment : ' + email_att + '\n'
-
-            '''
-                if isinstance(response_part, tuple):
-                    #print data
-                    print response_part.find('')
-                    msg = email.message_from_string(response_part[1])
-                    email_subject = msg['subject']
-                    email_from = msg['from']
-                    print 'From : ' + email_from + '\n'
-                    print 'Subject : ' + email_subject + '\n'
+                        if email_att == None:
+                            pass
+                        else:
+                            print 'Attachment : ' + email_att + '\n'
 
                 '''
+                    if isinstance(response_part, tuple):
+                        #print data
+                        print response_part.find('')
+                        msg = email.message_from_string(response_part[1])
+                        email_subject = msg['subject']
+                        email_from = msg['from']
+                        print 'From : ' + email_from + '\n'
+                        print 'Subject : ' + email_subject + '\n'
 
-def download_all_attachemnts(str_contains_anexo=''):
-    detach_dir = '/home/servidor/Desktop/'
-    if 'attachments' not in os.listdir(detach_dir):
-        os.mkdir('attachments')
+                    '''
 
-    userName = 'rafael.chow@graugestao.com.br'
-    passwd = '007J@mes'
 
-    try:
-        imapSession = imaplib.IMAP4_SSL('imap.gmail.com')
-        typ, accountDetails = imapSession.login(userName, passwd)
-        if typ != 'OK':
-            print 'Not able to sign in!'
-            raise
+    @staticmethod
+    def download_all_attachemnts(dir_path='', dir_name='attachments',str_contains_anexo='', str_contains_assunto=''):
+        detach_dir = dir_path
 
-        #imapSession.select('[Gmail]/All Mail')
-        imapSession.select('inbox')
-        typ, data = imapSession.search(None, 'ALL')
-        if typ != 'OK':
-            print 'Error searching Inbox.'
-            raise
+        monthDict = {'Jan':'1', 'Feb':'2', 'Mar':'3', 'Apr':'4', 'May':'5', 'Jun':'6', 'Jul':'7', 'Aug':'8', 'Sep':'9', 'Oct':'10', 'Nov':'11', 'Dec':'12'}
 
-        # Iterating over all emails
-        for msgId in data[0].split():
-            typ, messageParts = imapSession.fetch(msgId, '(RFC822)')
+        if dir_name not in os.listdir(detach_dir):
+            os.mkdir('attachments')
+
+        userName = 'rafael.chow@graugestao.com.br'
+        passwd = '007J@mes'
+
+        try:
+            imapSession = imaplib.IMAP4_SSL('imap.gmail.com')
+            typ, accountDetails = imapSession.login(userName, passwd)
             if typ != 'OK':
-                print 'Error fetching mail.'
+                print 'Not able to sign in!'
                 raise
 
-            emailBody = messageParts[0][1]
-            mail = message_from_string(emailBody)
-            print emailBody
-            for part in mail.walk():
-                if part.get_content_maintype() == 'multipart':
-                    continue
-                if part.get('Content-Disposition') is None:
-                    continue
+            #imapSession.select('[Gmail]/All Mail')
+            imapSession.select('inbox')
+            typ, data = imapSession.search(None, 'ALL')
+            if typ != 'OK':
+                print 'Error searching Inbox.'
+                raise
 
-                fileName = part.get_filename()
+            mailId =[]
+            messagePartsId = []
+            # Iterating over all emails
+            for msgId in data[0].split():
+                typ, messageParts = imapSession.fetch(msgId, '(RFC822)')
+                messagePartsId = messagePartsId + [messageParts]
+                mailId  = mailId + [msgId]
 
-                if bool(fileName):
-                    if str_contains_anexo != '':
+                print mailId
+                if typ != 'OK':
+                    print 'Error fetching mail.'
+                    raise
 
-                        date = mail['date']
-                        if str_contains_anexo in fileName:
-                            date = email.utils.parsedate(date)
-                            print date
-                            date = str(date[0]) + '-' + str(date[1]) + '-' + str(date[2])
-                            fileName = date + ' _ ' + fileName
-                            print fileName
-                            filePath = os.path.join(detach_dir, 'attachments', fileName)
-                            if not os.path.isfile(filePath) :
-                                fp = open(filePath, 'wb')
-                                fp.write(part.get_payload(decode=True))
-                                fp.close()
+            email_dictionary = dict(zip(mailId, messagePartsId))
 
-                    else:
-                        filePath = os.path.join(detach_dir, 'attachments', fileName)
-                        if not os.path.isfile(filePath) :
-                            print fileName
-                            fp = open(filePath, 'wb')
-                            fp.write(part.get_payload(decode=True))
-                            fp.close()
+            for i in mailId[::-1]:
+                emailBody = email_dictionary[i][0][1]
+                mail = message_from_string(emailBody)
+                print 'ID', i
+                date = mail['date']
+                date = date.split(' ')
+                data =  date[3] + '-' + monthDict[date[2]] + '-' + date[1] + '_' +  date[4]
+                subject = mail['subject'].decode('iso-8859-1')
+                print subject
+                for part in mail.walk():
+                    if part.get_content_maintype() == 'multipart':
+                        continue
+                    if part.get('Content-Disposition') is None:
+                        continue
 
-        imapSession.close()
-        imapSession.logout()
-    except :
-        print 'Not able to download all attachments.'
+                    fileName = part.get_filename()
+                    if bool(fileName):
+                        if str_contains_anexo != '':
+                            if isinstance(str_contains_anexo, list):
+                                for str_cont in str_contains_anexo:
+                                    if str_cont in fileName:
 
+                                        fileName = data + '_' + fileName
+
+                                        filePath = os.path.join(detach_dir, 'attachments', fileName)
+
+                                        if not os.path.isfile(filePath):
+                                            fp = open(filePath, 'wb')
+                                            fp.write(part.get_payload(decode=True))
+                                            fp.close()
+
+
+
+                        elif str_contains_assunto != '':
+                            if isinstance(str_contains_assunto, list):
+                                for subj in str_contains_assunto:
+                                    if subj in subject:
+                                        fileName = data + '_' + fileName
+
+                                        filePath = os.path.join(detach_dir, 'attachments', fileName)
+
+                                        if not os.path.isfile(filePath):
+                                            fp = open(filePath, 'wb')
+                                            fp.write(part.get_payload(decode=True))
+                                            fp.close()
+
+
+                        elif str_contains_assunto != '' and str_contains_anexo != '':
+                            for str_cont in str_contains_anexo:
+                                for subj in str_contains_assunto:
+                                    if (subj in subject):
+                                        if (str_cont in fileName):
+                                            print subj
+                                            fileName = data + '_' + fileName
+
+                                            filePath = os.path.join(detach_dir, 'attachments', fileName)
+
+                                            if not os.path.isfile(filePath):
+                                                fp = open(filePath, 'wb')
+                                                fp.write(part.get_payload(decode=True))
+                                                fp.close()
+
+
+            imapSession.close()
+            imapSession.logout()
+
+        except :
+            print 'Not able to download all attachments.'
+
+if __name__=='__main__':
+    email = grau_leitor_email()
+    anexo = ['pesc','PESC', 'Pesc', 'negs', 'papt', 'PAPT', 'Papt', 'PROD','Prod','prod','.xml','.zip']
+    assunto = ['[XMLs Fundos]', '[PLANNER]']
+    print grau_leitor_email.download_all_attachemnts(dir_path='/home/servidor/Desktop/', dir_name='attachments', str_contains_assunto=assunto, str_contains_anexo=anexo)
 # print leitor_email()
-print download_all_attachemnts(str_contains_anexo='pesc')
-# print download_all_attachemnts(str_contains_anexo='PAPT')
+# print download_all_attachemnts(str_contains_anexo='pesc')
+# print download_all_attachemnts(str_contains_anexo='PESC')
+# print download_all_attachemnts(str_contains_anexo='Pesc')
+#print download_all_attachemnts(str_contains_anexo='PAPT')
 # print download_all_attachemnts(str_contains_anexo='PROD')

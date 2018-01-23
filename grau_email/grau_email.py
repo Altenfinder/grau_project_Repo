@@ -1,3 +1,4 @@
+# encoding: 'latin-1'
 import smtplib
 import mimetypes
 from email.mime.multipart import MIMEMultipart

@@ -1,0 +1,55 @@
+<?xml version= "1.0" encoding="UTF-8"?>
+<arquivoposicao_4_01>
+<fundo>
+   <header>
+      <isin>BR**********</isin>
+      <cnpj>14298834000130</cnpj>
+      <nome>GRAU HEDGE FUNDO DE INVESTIMENTO MULTIMERCADO</nome>
+      <dtposicao>20171222</dtposicao>
+      <nomeadm>PLANNER CORRETORA DE VALORES SA</nomeadm>
+      <cnpjadm>00806535000154</cnpjadm>
+      <nomegestor>GRAU GESTAO DE ATIVOS LTDA</nomegestor>
+      <cnpjgestor>07252227000173</cnpjgestor>
+      <nomecustodiante>PLANNER CV SA</nomecustodiante>
+      <cnpjcustodiante>00806535000154</cnpjcustodiante>
+      <valorcota>0.00000000</valorcota>
+      <quantidade>0.000000000</quantidade>
+      <patliq>0.00</patliq>
+      <valorativos>0.00</valorativos>
+      <valorreceber>0.00</valorreceber>
+      <valorpagar>0.00</valorpagar>
+      <vlcotasemitir>0.00</vlcotasemitir>
+      <vlcotasresgatar>0.00</vlcotasresgatar>
+      <codanbid>301698</codanbid>
+      <tipofundo>331</tipofundo>
+      <nivelrsc></nivelrsc>
+   </header>
+   <despesas>
+      <txadm>0.00</txadm>
+      <tributos>0.00</tributos>
+      <perctaxaadm>0.00000000</perctaxaadm>
+      <txperf>N</txperf>
+      <vltxperf>0.00</vltxperf>
+      <perctxperf>0.00000000</perctxperf>
+      <percindex>0.00000000</percindex>
+      <outtax>0.00</outtax>
+      <indexador></indexador>
+   </despesas>
+   <outrasdespesas>
+      <coddesp>999</coddesp>
+      <valor>10.00</valor>
+   </outrasdespesas>
+   <outrasdespesas>
+      <coddesp>999</coddesp>
+      <valor>10.00</valor>
+   </outrasdespesas>
+   <outrasdespesas>
+      <coddesp>999</coddesp>
+      <valor>24.76</valor>
+   </outrasdespesas>
+   <outrasdespesas>
+      <coddesp>999</coddesp>
+      <valor>255.07</valor>
+   </outrasdespesas>
+</fundo>
+</arquivoposicao_4_01>

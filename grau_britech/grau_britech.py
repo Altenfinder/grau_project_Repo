@@ -214,12 +214,13 @@ class grau_britech:
                 id_britech = str(id_britech)
 
         if cpf_cnpj != '':
-            cpf_cnpj = pd.read_sql('select idpessoa, cpfcnpj as cpf_cnpj '
-                                     'from fin_grau.dbo.pessoa '
-                                     'where cpfcnpj in (' + cpf_cnpj + ');', con=self.cnx).set_index('cpf_cnpj')
+
+            cpf_cnpj = pd.read_sql("""select idpessoa, cpfcnpj as cpf_cnpj from fin_grau.dbo.pessoa where cpfcnpj like ('""" + cpf_cnpj + """');""", con=self.cnx).set_index('cpf_cnpj')
+
+            cpf_cnpj.reset_index(inplace=True, drop=True)
 
             if isinstance(cpf_cnpj, pd.DataFrame):
-                id_britech = str(cpf_cnpj.loc[0][0])
+                id_britech = str(cpf_cnpj.loc[cpf_cnpj.index[-1], 'idpessoa'])
 
             else:
                 id_britech = str(cpf_cnpj[0])
@@ -307,7 +308,7 @@ class grau_britech:
             df_query = pd.read_sql("select data, cotafechamento, idcarteira "
                                      "from fin_grau.dbo.historicocota "
                                      "where Data >= DATEADD (month,-" + str(intervalo) + ",GETDATE()) "
-                                     "and idindice in (" + id_britech + ") "
+                                     "and idcarteira in (" + id_britech + ") "
                                      "order by idcarteira asc, data asc;", con=self.cnx).set_index("data")
 
         if tipo_retorno == '':
@@ -348,8 +349,8 @@ class grau_britech:
         df_query = pd.read_sql('''select * from FIN_GRAU.dbo.HistoricoCota where Data >= DATEADD (month,-4,GETDATE()) and idCarteira
             in (''' + lista_query + ''');''', con=self.cnx).set_index('data')
 
-    def conta_corrente(self):
-        df_query = pd.read_sql('''select
+    def conta_corrente(self, data):
+        df_query = pd.read_sql("""select
                                a.IdCliente
                              , a.Apelido
                              , b.SaldoFechamento
@@ -358,7 +359,7 @@ class grau_britech:
                               , SaldoCaixa b
                             where
                               a.IdCliente = b.IdCliente
-                              and convert(varchar(10), b.Data, 103) = convert(varchar(10), '21/09/2017',103)
+                              and convert(varchar(10), b.Data, 103) = convert(varchar(10), '""" + data + """',103)
                               and a.IdCliente < 100
                               and a.StatusAtivo = 1
                               and b.IdConta not in (189, 190, 195, 204, 205, 209, 224, 233, 234, 245, 251, 256, 255, 263, 264)
@@ -366,8 +367,7 @@ class grau_britech:
                               and a.IdCliente not in (2, 4, 18, 16, 67, 83, 84, 85, 86, 87, 88, 89, 90, 91, 93, 94, 96, 97, 99,43,32,47,46,31,59,63,66,53,68,29,3)
                             Order by
                               a.Apelido
-
-                              ''', con=self.cnx).set_index('IdCliente')
+                              """, con=self.cnx).set_index('IdCliente')
         return df_query
 #
 

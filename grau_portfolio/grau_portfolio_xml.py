@@ -10,11 +10,12 @@ from grau_project.grau_comdinheiro.grau_comdinheiro import grau_comdinheiro
 
 pd.options.mode.chained_assignment = None
 
-class grau_portfolio_xml():
+class grau_portfolio_xml:
     def __init__(self, xml_path='', xml_file=''):
+        print '__init__ called'
         self.xml_path = xml_path
         self.xml_file = xml_file
-        self.xml_full_file = os.path.join(self.xml_path, self.xml_file)
+        self.xml_full_file = self.xml_path + self.xml_file
         self.dom = ElementTree.parse(self.xml_full_file)
 
     def parse_header(self, tipo=''):
@@ -99,11 +100,16 @@ class grau_portfolio_xml():
                 return float(tp_patliq[0])
             elif tipo == 'nome':
                 return str(tp_nome[0])
+            elif tipo == 'data':
+                return str(tp_dtposicao[0])
 
     def pl(self):
         return grau_portfolio_xml.parse_header(self, tipo='pl')
 
     def nome(self):
+        return grau_portfolio_xml.parse_header(self, tipo='nome')
+
+    def data(self):
         return grau_portfolio_xml.parse_header(self, tipo='nome')
 
     def parse_acoes(self, tipo=''):
@@ -255,6 +261,7 @@ class grau_portfolio_xml():
             df['peso'] = df['valor_posicao'] / (grau_portfolio_xml.pl(self))
             df['tipo'] = 'cotas'
             df = df[['tipo', 'valor_posicao', 'tp_cnpjfundo', 'peso']]
+            df.columns = ['tipo', 'valor_posicao', 'cnpj_fundo', 'peso']#### TESTE
             return df.reset_index(drop=True)
 
         else:
@@ -730,7 +737,7 @@ class grau_portfolio_xml():
                     if df['tipo'][i] == 'debenture':
                         df['ticker_comdinheiro'][i] = df['codativo'][i]
 
-            #if ticker_comdinheiro == True
+
 
             if ajustar_pesos == True:
                 peso = df['peso'].sum()

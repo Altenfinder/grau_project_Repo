@@ -7,6 +7,7 @@ from grau_project.grau_datas import grau_datas
 import time
 
 
+
 class grau_britech_site:
     def __init__(self):
         # self.driver_options = webdriver.FirefoxOptions()
@@ -49,9 +50,13 @@ class grau_britech_site:
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_chkPlCotaGalgoWcf"]').click()
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_chkTMRV"]').click()
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_chkBVBG044"]').click()
-        self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_textDataInicioInternet_I"]').click()
+        #self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_textDataInicioInternet_I"]').click()
+        self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_textDataInicioInternet_I"]/value=').send_keys('12122017')
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_textDataFimInternet_I"]').click()
+
+
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_btnRunInternet"]').click()
+
         self.driver.close()
 
     def interface_importacao_debentures(self, ativo='', valor=''):
@@ -84,6 +89,33 @@ class grau_britech_site:
         time.sleep(6)
         self.driver.find_element_by_xpath('//*[@id="popupImportarCotas_btnRunImportarCotas"]').click()
 
+    def upload_importacao_operacoes(self, tipo_upload='', file_path=''):
+        time.sleep(3)
+        self.driver.get('https://saas.britech.com.br/grau/Interfaces/Importacao.aspx')
+        time.sleep(3)
+        self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_T1T"]/span').click()
+        time.sleep(3)
+        self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_textDataArquivos_I"]').click()
+        time.sleep(3)
+
+        if tipo_upload == 'pesc':
+            self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_uplPESC_TextBox0_Input"]').send_keys(file_path)
+            time.sleep(3)
+
+        if tipo_upload == 'papt':
+            self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_uplPAPT_TextBox0_Input"]').send_keys(file_path)
+            time.sleep(3)
+
+        if tipo_upload == 'prod':
+            self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_uplPROD_TextBox0_Input"]').send_keys(file_path)
+            time.sleep(3)
+
+        self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_btnRunInternet"]').click()
+        
+        # self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_btnLimpar"]
+        #file_input = self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_uplPESC_TextBox0')
+        # file_input.send_keys("/home/servidor/Desktop/pesc_final_final.txt")
+
     def close(self):
         return self.driver.quit()
 
@@ -91,4 +123,4 @@ class grau_britech_site:
 if __name__=='__main__':
     britech_site = grau_britech_site()
     #print britech_site.interface_importacao_debentures(ativo='CRI_PENTAGONO', valor='23131,32')
-    print britech_site.atualizacao_cotas_fundos()
+    print britech_site.interface_importacao_geral()

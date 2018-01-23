@@ -19,7 +19,7 @@ class grau_pentagono_site:
 
         pentagono_url = 'http://www.pentagonotrustee.com.br/PrecosUnitarios.aspx'
         self.driver=webdriver.Firefox(executable_path='/usr/lib/python2.7/dist-packages/grau_project/grau_geckdriver/geckodriver')
-        self.driver.set_page_load_timeout(40)
+        self.driver.set_page_load_timeout(360)
 
         load = False
         while load == False:
@@ -29,7 +29,6 @@ class grau_pentagono_site:
                 print load
             except TimeoutException:
                 print 'Falha no carregamento do site - Tentando novamente'
-
 
         self.select = Select(self.driver.find_element_by_xpath('//*[@id="ctl00_Conteudo_Ativo"]'))
         time.sleep(2)
