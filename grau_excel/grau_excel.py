@@ -117,6 +117,12 @@ class grau_excel:
         self.openpy_workbook.save(self.workbook_path)
 
 
+    def max_lin(self):
+        max_lin = self.openpy_sheet.max_row
+        return max_lin
+
+
+
     def border(self, lin=1, col=1, style='thin'):
 
         max_col = self.openpy_sheet.max_column
@@ -151,7 +157,7 @@ class grau_excel:
                 if decimals == '0' or decimals == 0:
                     self.openpy_sheet.cell(row=lin, column=column).number_format = '0%'
                 elif decimals == '1' or decimals == 1:
-                    self.openpy_sheet.cell(row=lin, column=column).number_format = '0.0%'
+                    self.openpy_sheet.cell(row=lin, column=column).number_format = '0.0%' # funciona
                 elif decimals == '2' or decimals == 2:
                     self.openpy_sheet.cell(row=lin, column=column).number_format = '0.00%'
                 elif decimals == '4' or decimals == 4:
@@ -161,7 +167,7 @@ class grau_excel:
                 if decimals == '0' or decimals == 0:
                     self.openpy_sheet.cell(row=lin, column=column).number_format = '#,##0.00'
                 elif decimals == '1' or decimals == 1:
-                    self.openpy_sheet.cell(row=lin, column=column).number_format = '#,##0.00'
+                    self.openpy_sheet.cell(row=lin, column=column).number_format = '#,##0.00' #funciona
                 elif decimals == '2' or decimals == 2:
                     self.openpy_sheet.cell(row=lin, column=column).number_format = '#,##0.00'
                 elif decimals == '4' or decimals == 4:

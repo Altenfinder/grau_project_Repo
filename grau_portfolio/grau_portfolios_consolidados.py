@@ -19,16 +19,23 @@ class grau_portfolio_consolidado:
         self.xml_path = '/usr/lib/python2.7/dist-packages/grau_project/grau_portfolio/temp/xml_grau/'
         self.temp_path = '/usr/lib/python2.7/dist-packages/grau_project/grau_portfolio/temp/tickers_consolidados/'
         self.timedelta = timedelta
+        self.britech = grau_britech()
+
 
         if data == '':
             date = datetime.now()
             self.data = str(date.year) + '-' + str(date.month) +  '-' + str(date.day)
 
-    def consolidada_xml(self, final_path):
-        for file in os.listdir(self.path):
-            if file.endswith(".xml"):# and file[:file.find('_')] == self.data:
-                self.portfolio_xml = grau_portfolio_xml(xml_path=self.path, xml_file=file)
-                print copy2(self.path + file, final_path + self.portfolio_xml.data() + "_" + self.portfolio_xml.nome().replace(' ','_').replace('.','') + '.xml')
+    @staticmethod
+    def consolidada_xml(inital_path, final_path):
+        for file in os.listdir(inital_path):
+            if file.endswith(".xml"):
+                portfolio_xml = grau_portfolio_xml(xml_path=inital_path, xml_file=file)
+                try:
+                    print copy2(inital_path + file, final_path + str(portfolio_xml.data()) + "_" + portfolio_xml.nome().replace(' ','_').replace('.','') + '.xml')
+                except:
+                    print (inital_path + file), ' esta com erro'
+
 
     def consolidada_tickers(self):
         self.ticker_bloomberg = pd.DataFrame(columns=['ticker_bloomberg'])
@@ -71,32 +78,47 @@ class grau_portfolio_consolidado:
         duration.to_pickle(path + self.data + '_' + 'duration')
         return duration
 
-    def cotas(self):
+    def cotas(self, tratar_cotas=True):
+        # O parametro tratar cotas transforma as cotas de fechamento mensal em cotas diarias. Embora esse metodo distorca o desvio-padrao do fundo, ele eh necessario para o calculo da covariancia e da VaR.
         path = '/usr/lib/python2.7/dist-packages/grau_project/grau_portfolio/temp/fundos/'
         ativos = pd.read_pickle(self.temp_path + 'ticker_cnpj_fundo')['cnpj_fundo']
         print ativos
-        self.britech = grau_britech()
 
         for cnpj in ativos:
             historico_precos = self.britech.carteiras(cpf_cnpj=cnpj, intervalo=12) #,  data_especifica='',data_especifica_inicial='', data_especifica_final='', tipo_retorno='', acumular_retorno=False, data_ultima_atualizacao=False, pl=False):
             historico_precos = historico_precos['cotafechamento']
             historico_precos.columns = [cnpj]
-            print historico_precos
-            historico_precos.to_piickle(path + self.data + cnpj)
+            historico_precos.to_pickle(path + self.data + cnpj)
+            '''
+            if tratar_cotas == True:
+                if (historico_precos.shape[0] < 20) and (historico_precos.shape[0] != 0):
+                    historico_precos = historico_precos.avg()
+
+                    index = historico_precos.index
+                    for i in index:
+                        # if
+                        #     temp_historico_precos = historico_precos.apply(lambda x: x = )
+                        pass
+            '''
 
         return historico_precos
 
-    def main():
-        pass
-
+    def main(self):
+        grau_portfolio_consolidado.bloomberg()
+        grau_portfolio_consolidado.cotas()
+        try:
+            grau_portfolio_consolidado.comdinheiro_duration()
+        except:
+            pass
 
 if __name__=='__main__':
-    grau_portfolio_consolidado = grau_portfolio_consolidado('/usr/lib/python2.7/dist-packages/grau_project/grau_portfolio/temp/xml_planner/', data='2017-11-08')
-    # print grau_portfolio_consolidado.consolidada_xml(final_path='/usr/lib/python2.7/dist-packages/grau_project/grau_portfolio/temp/xml_grau/')
+    grau_portfolio_consolidado = grau_portfolio_consolidado('/usr/lib/python2.7/dist-packages/grau_project/grau_portfolio/temp/xml_planner/', data='2017-11-29')
+    grau_portfolio_consolidado.consolidada_xml(inital_path='/usr/lib/python2.7/dist-packages/grau_project/grau_portfolio/temp/xml_planner/', final_path='/usr/lib/python2.7/dist-packages/grau_project/grau_portfolio/temp/xml_grau/')
+    print grau_portfolio_consolidado.cotas(tratar_cotas=False)
     # print grau_portfolio_consolidado.consolidada_tickers()
-    #print grau_portfolio_consolidado.bloomberg()
-    print grau_portfolio_consolidado.comdinheiro_duration()
-    # print grau_portfolio_consolidado.cotas()
+    # print grau_portfolio_consolidado.main()
+    # print grau_portfolio_consolidado.comdinheiro_duration()
+
     # britech = grau_britech()
     # print britech.query("""select * from pessoa where idpessoa like '1234567';""")
     # cpf_cnpj = '01653201000150'

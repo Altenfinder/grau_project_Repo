@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 class grau_geckodriver(object):
-    def __init__(self):
+    def __init__(self, download_path):
         # self.driver_options.add_experimental_option('prefs', prefs)
         # self.display = Display(visible=0, size=(800, 600))
         # self.display.start()
@@ -13,7 +13,7 @@ class grau_geckodriver(object):
         self.profile.set_preference("browser.download.panel.shown", False)
         self.profile.set_preference('browser.download.folderList', 2)
         self.profile.set_preference('browser.download.manager.showWhenStarting', False)
-        self.profile.set_preference('browser.download.dir', '/usr/lib/python2.7/dist-packages/grau_project/grau_informa_planner_site/downloaded')
+        self.profile.set_preference('browser.download.dir', download_path)
         self.profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv,application/vnd.ms-excel")
         self.profile.set_preference("browser.helperApps.neverAsk.openFile", "text/csv,application/vnd.ms-excel")
         self.driver = webdriver.Firefox(firefox_profile=self.profile, executable_path='/usr/lib/python2.7/dist-packages/grau_project/grau_geckodriver/geckodriver')

@@ -1,0 +1,17 @@
+,Unnamed: 0,horario,rotina,file,full_file,status,mensagem
+0,0,2018-01-30 17:25:45.139806,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,local variable 'arquivo_upload' referenced before assignment
+1,1,2018-01-30 17:26:54.273897,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,local variable 'arquivo_upload' referenced before assignment
+2,2,2018-01-30 17:28:46.480213,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,OK,nan
+3,3,2018-01-30 17:29:54.059594,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,local variable 'arquivo_upload' referenced before assignment
+4,4,2018-01-30 17:32:28.209998,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,OK,nan
+5,5,2018-01-30 17:37:46.137663,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,global name 'WebDriverWait' is not defined
+6,6,2018-01-30 17:37:52.229316,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,global name 'WebDriverWait' is not defined
+7,7,2018-01-30 17:38:31.842293,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,global name 'WebDriverWait' is not defined
+8,8,2018-01-30 17:38:37.944496,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,global name 'WebDriverWait' is not defined
+9,9,2018-01-30 17:39:32.701977,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,local variable 'arquivo_upload' referenced before assignment
+10,10,2018-01-30 17:40:36.214464,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,global name 'wait' is not defined
+11,11,2018-01-30 17:42:24.871400,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,local variable 'arquivo_upload' referenced before assignment
+12,12,2018-01-30 17:43:29.223944,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,global name 'wait' is not defined
+13,13,2018-01-30 17:46:33.218631,upload_prod,grau_pesc.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/pesc/grau_pesc.py,ERRO,list index out of range
+14,14,2018-01-30 17:50:15.078717,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,global name 'wait' is not defined
+15,15,2018-01-30 17:51:56.863472,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,global name 'wait' is not defined

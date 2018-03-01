@@ -12,7 +12,6 @@ pd.options.mode.chained_assignment = None
 
 class grau_portfolio_xml:
     def __init__(self, xml_path='', xml_file=''):
-        print '__init__ called'
         self.xml_path = xml_path
         self.xml_file = xml_file
         self.xml_full_file = self.xml_path + self.xml_file
@@ -717,7 +716,45 @@ class grau_portfolio_xml:
         else:
             return df
 
-    def portfolio(self, tipo='', apenas_ativos_risco=False, ajustar_pesos=False, ticker_bloomberg=True,ticker_comdinheiro=True):
+    @staticmethod
+    def check_rf(isin):
+        '''
+        Chuta o ticker comdinhero de renda fixa dado um isin.
+         - BRSTNC eh o codigo para LFTs.
+         - O codigo BRSNTN eh para NTNs.
+         - Vai travar o programa: LTNs.
+        '''
+        if 'LF1' in isin[7:10]:
+            return 'LFT'
+        elif 'NTB' in isin[7:10]:
+            return 'NTNB'
+        elif 'NTF' in isin[7:10]:
+            return 'NTNF'
+        elif 'NTC' in isin[7:10]:
+            return 'NTNC'
+        elif 'LTN' in isin[7:10]:
+            return 'LTN'
+
+    @staticmethod
+    def ticker_rf(isin, dtemissao, dtvencimento):
+        '''
+        Chuta o ticker comdinhero de renda fixa dado um isin.
+         - BRSTNC eh o codigo para LFTs.
+         - O codigo BRSNTN eh para NTNs.
+         - Vai travar o programa: LTNs.
+        '''
+        if 'LF1' in isin[7:10]:
+            return 'LFT_' + str(dtemissao) + '_' + str(dtvencimento)
+        elif 'NTB' in isin[7:10]:
+            return 'NTNB_' + str(dtemissao) + '_' + str(dtvencimento)
+        elif 'NTF' in isin[7:10]:
+            return 'NTNF_' + str(dtemissao) + '_' + str(dtvencimento)
+        elif 'NTC' in isin[7:10]:
+            return 'NTNC_' + str(dtemissao) + '_' + str(dtvencimento)
+        elif 'LTN' in isin[7:10]:
+            return 'LTN_' + str(dtemissao) + '_' + str(dtvencimento)
+
+    def portfolio(self, tipo='', apenas_ativos_risco=False, ajustar_pesos=False, ticker_bloomberg=True,ticker_comdinheiro=False):
 
         if apenas_ativos_risco == True:
 
@@ -730,6 +767,7 @@ class grau_portfolio_xml:
                 for i, rows in enumerate(df['tipo']):
                     df['ticker_bloomberg'][i] =  functions_bloomberg.isin_bloomberg(df['isin'][i])
 
+
             if ticker_comdinheiro == True:
                 df['ticker_comdinheiro'] = ''
                 for i, rows in enumerate(df['tipo']):
@@ -737,7 +775,14 @@ class grau_portfolio_xml:
                     if df['tipo'][i] == 'debenture':
                         df['ticker_comdinheiro'][i] = df['codativo'][i]
 
-
+            elif ticker_comdinheiro == False:
+                df['ticker_comdinheiro'] = np.nan
+                for i, rows in enumerate(df['tipo']):
+                    print df['tipo'][i], df['isin'][i], grau_portfolio_xml.check_rf(str(df['isin'][i]))
+                    if df['tipo'][i] == 'titpublicos' and grau_portfolio_xml.check_rf(str(df['isin'][i])) != 'LFT':
+                        df['ticker_comdinheiro'][i] =  grau_portfolio_xml.ticker_rf(isin=(str(df['isin'][i])), dtemissao=(df['dtemissao'][i]) ,dtvencimento=df['dtvencimento'][i])
+                    if df['tipo'][i] == 'debenture':
+                        df['ticker_comdinheiro'][i] = df['codativo'][i]
 
             if ajustar_pesos == True:
                 peso = df['peso'].sum()
@@ -755,8 +800,8 @@ class grau_portfolio_xml:
 
 
 if __name__=='__main__':
-    portfolio = grau_portfolio_xml(xml_path='/home/rafael/rafael.chow@graugestao.com.br/xml_planner/xml/atual', #xml_file='FD14298834000130_20171109_20171113093348_Grau Hedge.xml')
-    xml_file='FD18716438000136_20171109_20171113093935_OMF FI Multimercado.xml')
+    portfolio = grau_portfolio_xml(xml_path='/usr/lib/python2.7/dist-packages/grau_project/grau_portfolio/temp/xml_grau/', #xml_file='FD14298834000130_20171109_20171113093348_Grau Hedge.xml')
+    xml_file='20171130_OMF_FI_MULTIMERCADO_CP_INVESTIMENTO_DO_EXTERIOR.xml')
 
     #print portfolio.parse_caixa()
     #print portfolio.parse_acoes()
@@ -765,11 +810,15 @@ if __name__=='__main__':
     #print pd.concat([portfolio.parse_cotas(),portfolio.parse_debentures()])
     #print portfolio.portfolio()[['codativo','isin']]
     #print portfolio.portfolio(tipo='sintetico',apenas_ativos_risco=True,ajustar_pesos=False, ticker_bloomberg=True)['ticker_comdinheiro']
-    teste = portfolio.portfolio(tipo='sintetico',apenas_ativos_risco=True,ajustar_pesos=False, ticker_bloomberg=True)['ticker_comdinheiro']
+    teste = portfolio.portfolio(tipo='sintetico',apenas_ativos_risco=True,ajustar_pesos=False, ticker_bloomberg=True, ticker_comdinheiro=False)['ticker_comdinheiro']
     #print functions_comdinheiro.formato_comdinheiro_lista_ativos(teste, tipo='ativos')
     #print functions_comdinheiro.formato_comdinheiro_lista_ativos(teste, tipo='')
+
+    print teste
+
     comdinheiro = grau_comdinheiro()
     print comdinheiro.duration(df=teste)
+
     #print portfolio.portfolio(tipo='sintetico')['peso'].sum()
     #print portfolio.parse_header(tipo='pl')
     #print portfolio.parse_acoes(tipo='')

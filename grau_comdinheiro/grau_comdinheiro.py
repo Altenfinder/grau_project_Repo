@@ -9,7 +9,7 @@ class grau_comdinheiro:
     def __init__(self):
         #self.display = Display(visible=0, size=(800, 600))
         #self.display.start()
-        self.driver = webdriver.Firefox(executable_path='/usr/lib/python2.7/dist-packages/grau_project/grau_geckdriver/geckodriver')
+        self.driver = webdriver.Firefox(executable_path='/usr/lib/python2.7/dist-packages/grau_project/grau_geckodriver/geckodriver')
         self.login = 'feausp'
         self.password = 'feausp'
         self.driver.get('https://www.comdinheiro.com.br/home2/')
@@ -22,19 +22,26 @@ class grau_comdinheiro:
         self.driver.find_element_by_xpath('//*[@id="login_button"]').click()
 
     def duration(self, df):
-        time.sleep(5)
-        url_duration = 'https://www.comdinheiro.com.br/Duration001.php?&data=' + grau_datas.padrao_brasileiro_datas() +'&papeis=' + functions_comdinheiro.formato_comdinheiro_lista_ativos(df, tipo='ativos') + '&quantidades=' + functions_comdinheiro.formato_comdinheiro_lista_ativos(df, tipo='') + '+&num_casas=3&flag_nd=0&agrupar=0&vertices=&check_duration=modo2&flag_discrimina_juros=1'
-        self.driver.get(url_duration)
-        time.sleep(5)
+        if not len(df.dropna().index) == 0:
+            print 'DF ESTA AQUI', df
 
-        df_html = pd.read_html(self.driver.page_source, thousands='.', decimal=',')
+            time.sleep(5)
+            url_duration = 'https://www.comdinheiro.com.br/Duration001.php?&data=' + grau_datas.padrao_brasileiro_datas() +'&papeis=' + functions_comdinheiro.formato_comdinheiro_lista_ativos(df, tipo='ativos') + '&quantidades=' + functions_comdinheiro.formato_comdinheiro_lista_ativos(df, tipo='') + '+&num_casas=3&flag_nd=0&agrupar=0&vertices=&check_duration=modo2&flag_discrimina_juros=1'
+            self.driver.get(url_duration)
+            time.sleep(5)
 
-        df_html_debenture = df_html[-4]
-        df_html_ntnb = df_html[-2]
+            df_html = pd.read_html(self.driver.page_source, thousands='.', decimal=',')
 
-        df = pd.concat([df_html_debenture, df_html_ntnb])
+            df_html_debenture = df_html[-4]
+            df_html_ntnb = df_html[-2]
 
-        return df
+            df = pd.concat([df_html_debenture, df_html_ntnb])
+            self.driver.quit()
+            return df
+
+        else:
+            self.driver.quit()
+            return 'Nao ha ativos a serem buscados na comdinheiro'
 
     @staticmethod
     def isin_comdinheiro(isin):

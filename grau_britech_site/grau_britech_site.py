@@ -4,9 +4,15 @@ from selenium import webdriver
 import os, sys
 from pyvirtualdisplay import Display
 from grau_project.grau_datas import grau_datas
+from selenium.webdriver.common.keys import Keys
 import time
-
-
+from subprocess import Popen, PIPE
+from datetime import datetime, timedelta
+from grau_project.grau_datas import grau_datas
+from grau_project.grau_excel.grau_excel import grau_excel
+from grau_project.grau_utilities.grau_utilities import grau_utilities
+from selenium.webdriver.support import expected_conditions as EC
+import glob
 
 class grau_britech_site:
     def __init__(self):
@@ -15,7 +21,19 @@ class grau_britech_site:
         # self.driver_options.add_experimental_option('prefs', prefs)
         # self.display = Display(visible=0, size=(800, 600))
         # self.display.start()
-        self.driver = webdriver.Firefox(executable_path='/usr/lib/python2.7/dist-packages/grau_project/grau_geckdriver/geckodriver')
+        self.profile = webdriver.FirefoxProfile()
+        self.profile.set_preference("browser.upload.panel.shown", False)
+        self.profile.set_preference('browser.upload.manager.showWhenStarting', False)
+        self.profile.set_preference("browser.download.panel.shown", False)
+        self.profile.set_preference('browser.download.folderList', 2)
+        self.profile.set_preference('browser.download.manager.showWhenStarting', False)
+        self.profile.set_preference('browser.download.dir', '/usr/lib/python2.7/dist-packages/grau_project/grau_britech_site/downloaded')
+        self.profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv,application/vnd.ms-excel")
+        self.profile.set_preference("browser.helperApps.neverAsk.openFile", "text/csv,application/vnd.ms-excel")
+        self.profile.set_preference("javascript.enabled", False)
+        self.driver = webdriver.Firefox(firefox_profile=self.profile, executable_path='/usr/lib/python2.7/dist-packages/grau_project/grau_geckodriver/geckodriver')
+        #waitForPresence = WebDriverWait(self.driver, 600)
+
         self.login = 'rafael'
         self.password = 'gestao1400'
         self.driver.get('https://saas.britech.com.br/grau/Login/LoginInit.aspx?ReturnUrl=%2fgrau%2f')
@@ -50,16 +68,21 @@ class grau_britech_site:
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_chkPlCotaGalgoWcf"]').click()
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_chkTMRV"]').click()
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_chkBVBG044"]').click()
-        #self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_textDataInicioInternet_I"]').click()
-        self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_textDataInicioInternet_I"]/value=').send_keys('12122017')
+
+        time.sleep(5)
+        data = self.driver.find_element_by_xpath("""//*[@id="ASPxRoundPanel1_tabArquivos_textDataInicioInternet_I"]""")
+        self.driver.find_element_by_xpath("""//*[@id="ASPxRoundPanel1_tabArquivos_textDataInicioInternet_I"]""").click()
+        self.driver.execute_script("ASPxRoundPanel1_tabArquivos_textDataInicioInternet_I.value = '" + grau_datas.data_britech(delta_days=-7) + "';", data)
+
+        time.sleep(5)
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_textDataFimInternet_I"]').click()
 
-
+        time.sleep(5)
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_btnRunInternet"]').click()
 
-        self.driver.close()
 
     def interface_importacao_debentures(self, ativo='', valor=''):
+
         self.driver.get('https://saas.britech.com.br/grau/CadastrosBasicos/RendaFixa/CotacaoSerie.aspx')
         time.sleep(6)
         self.driver.find_element_by_xpath('//*[@id="btnAdd"]/div').click()
@@ -79,6 +102,7 @@ class grau_britech_site:
         self.driver.find_element_by_xpath('//*[@id="gridCadastro_DXPEForm_efnew_btnOK"]').click()
         time.sleep(6)
 
+
     def atualizacao_cotas_fundos(self):
         time.sleep(6)
         self.driver.get('https://saas.britech.com.br/grau/CadastrosBasicos/Fundo/CotaFundo.aspx')
@@ -89,32 +113,88 @@ class grau_britech_site:
         time.sleep(6)
         self.driver.find_element_by_xpath('//*[@id="popupImportarCotas_btnRunImportarCotas"]').click()
 
-    def upload_importacao_operacoes(self, tipo_upload='', file_path=''):
-        time.sleep(3)
+    def upload_importacao_operacoes(self, tipo_upload='', file_path='', data=''):
+        time.sleep(7)
         self.driver.get('https://saas.britech.com.br/grau/Interfaces/Importacao.aspx')
-        time.sleep(3)
+        time.sleep(7)
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_T1T"]/span').click()
-        time.sleep(3)
+        time.sleep(7)
         self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_textDataArquivos_I"]').click()
-        time.sleep(3)
+        time.sleep(7)
 
         if tipo_upload == 'pesc':
-            self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_uplPESC_TextBox0_Input"]').send_keys(file_path)
+            self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_uplPESC_TextBox0_Input"]').send_keys(os.path.abspath(file_path))
+            control_f4_sequence = '''key Alternate_L key F4'''
+            print grau_britech_site.keypress(control_f4_sequence)
             time.sleep(3)
 
         if tipo_upload == 'papt':
             self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_uplPAPT_TextBox0_Input"]').send_keys(file_path)
+            control_f4_sequence = '''key Alternate_L key F4'''
+            print grau_britech_site.keypress(control_f4_sequence)
             time.sleep(3)
 
         if tipo_upload == 'prod':
             self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_uplPROD_TextBox0_Input"]').send_keys(file_path)
+            control_f4_sequence = '''key Alternate_L key F4'''
+            print grau_britech_site.keypress(control_f4_sequence)
             time.sleep(3)
 
-        self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_btnRunInternet"]').click()
-        
-        # self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_btnLimpar"]
-        #file_input = self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_uplPESC_TextBox0')
-        # file_input.send_keys("/home/servidor/Desktop/pesc_final_final.txt")
+        if data != '':
+            data_fim = self.driver.find_element_by_xpath("""//*[@id="ASPxRoundPanel1_tabArquivos_textDataArquivos_I"]""")
+            self.driver.find_element_by_xpath("""//*[@id="ASPxRoundPanel1_tabArquivos_textDataArquivos_I"]""").click()
+            time.sleep(5)
+
+            self.driver.execute_script("ASPxRoundPanel1_tabArquivos_textDataArquivos_I.value = '" + grau_datas.data_britech(data=data) + "';", data_fim)
+
+        else:
+            self.driver.find_element_by_xpath("""//*[@id="ASPxRoundPanel1_tabArquivos_textDataArquivos_I"]""").click()
+
+
+        time.sleep(7)
+        print 'fazendo o upload'
+        time.sleep(3)
+        self.driver.find_element_by_xpath('//*[@id="ASPxRoundPanel1_tabArquivos_btnRunArquivos"]').click()
+
+        wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="ASPxRoundPanel1_tabArquivos_btnRunArquivos"]')))
+        time.sleep(300)
+
+        # Salva imagem
+        if isinstance(data, datetime):
+            data = str(data.year) + '-' + str(data.month) +  '-' + str(data.day)
+
+        screenshot_path = '/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/' + tipo_upload + '/temp/upload/' + data + '_' + tipo_upload + '_upload.png'
+        self.driver.save_screenshot(screenshot_path)
+
+        time.sleep(5)
+        self.driver.quit()
+
+    def vencimentos_futuros(self):
+
+        self.driver.get('https://saas.britech.com.br/grau/Consultas/Vencimentos.aspx')
+
+        data_fim = self.driver.find_element_by_xpath("""//*[@id="textDataFim_I"]""")
+        self.driver.find_element_by_xpath("""//*[@id="textDataFim_I"]""").click()
+        time.sleep(5)
+        self.driver.execute_script("textDataFim_I.value = '" + grau_datas.data_britech(delta_days=8) + "';", data_fim)
+
+        data_fim = self.driver.find_element_by_xpath("""//*[@id="textDataInicio_I"]""")
+        self.driver.find_element_by_xpath("""//*[@id="textDataInicio_I"]""").click()
+        time.sleep(5)
+        self.driver.execute_script("textDataInicio_I.value = '" + grau_datas.data_britech(delta_days=0) + "';", data_fim)
+
+        self.driver.find_element_by_xpath('//*[@id="btnExcel"]').click()
+        time.sleep(15)
+
+        excel_file = grau_utilities.find_most_recent_file(folder_path='/usr/lib/python2.7/dist-packages/grau_project/grau_britech_site/downloaded')
+
+        return excel_file
+
+    @staticmethod
+    def keypress(sequence):
+        p = Popen(['xte'], stdin=PIPE)
+        p.communicate(input=sequence)
+
 
     def close(self):
         return self.driver.quit()
@@ -122,5 +202,5 @@ class grau_britech_site:
 
 if __name__=='__main__':
     britech_site = grau_britech_site()
-    #print britech_site.interface_importacao_debentures(ativo='CRI_PENTAGONO', valor='23131,32')
-    print britech_site.interface_importacao_geral()
+    print britech_site.interface_importacao_teste()
+    #britech_site.upload_importacao_operacoes(tipo_upload='pesc', file_path='/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/temp/pesc/final/2018-1-22_pesc.txt')

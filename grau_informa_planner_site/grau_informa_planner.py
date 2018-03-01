@@ -1,6 +1,7 @@
 from grau_project.grau_geckodriver.grau_geckodriver import grau_geckodriver
 from grau_project.grau_excel.grau_excel import grau_excel
 from grau_project.grau_email import grau_email
+from grau_project.grau_datas import grau_datas
 from datetime import datetime
 import pandas as pd
 import glob
@@ -10,7 +11,7 @@ import time
 
 class grau_informa_planner(grau_geckodriver):
     def __init__(self):
-        super(grau_informa_planner, self).__init__()
+        super(grau_informa_planner, self).__init__(download_path='/usr/lib/python2.7/dist-packages/grau_project/grau_informa_planner_site/downloaded')
         time.sleep(2)
         self.driver.get('http://informa.planner.com.br/vdfpmf/index.asp')
         time.sleep(5)
@@ -31,7 +32,9 @@ class grau_informa_planner(grau_geckodriver):
         time.sleep(10)
         folder = glob.glob('/usr/lib/python2.7/dist-packages/grau_project/grau_informa_planner_site/downloaded/*')
         latest_file = max(folder, key=os.path.getctime)
-        self.filename = '/usr/lib/python2.7/dist-packages/grau_project/grau_informa_planner_site/downloaded/' + 'downloaded_caixa_planner_' + str(datetime.now())+ '.csv'
+        now = datetime.now()
+        data = str(now.year) + '-' + str(now.month) + '-' + str(now.day) + '_' +  str(now.hour) + ':' +  str(now.minute)
+
         os.rename(latest_file, self.filename)
         self.driver.quit()
 
@@ -98,6 +101,5 @@ if __name__=='__main__':
     informa_planner = grau_informa_planner()
     informa_planner.caixa_carteiras()
 
-    path_caixa = '/usr/lib/python2.7/dist-packages/grau_project/grau_informa_planner_site/downloaded/downloaded_caixa_planner_2018-01-22 16:02:27.502435.csv'
     informa_planner.caixa_planner()
     informa_planner.envio_email()

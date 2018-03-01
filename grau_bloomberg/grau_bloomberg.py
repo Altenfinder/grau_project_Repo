@@ -7,7 +7,7 @@ from datetime import timedelta
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-class grau_bloomberg():
+class grau_bloomberg(dm):
     def __init__(self, ativos, initial_date='', final_date='', timedelta = ''):
         self.sessionOptions = blpapi.SessionOptions()
         self.sessionOptions.setServerHost("192.168.15.102")
@@ -47,7 +47,6 @@ class grau_bloomberg():
     def columns_adj(px):
         columns = []
         for column in px.columns:
-            print column[0]
             columns = columns + [column[0]]
         px.columns = columns
         return px
@@ -101,7 +100,7 @@ class grau_bloomberg():
 
 
 if __name__=='__main__':
-    ativos = ['VIX Index', 'SPX Index', 'USDBRLV5Y Curncy', 'BZIDINTL Index', ' BRLDDEBT Index', 'IBOV INDEX', 'TED3 Curncy']
+    ativos = ['VIX Index', 'SPX Index', 'USDBRLV5Y Curncy', 'BZIDINTL Index', 'BRLDDEBT Index', 'IBOV INDEX', 'TED3 Curncy','CBRZ1U5 CBIN Curncy', 'ITRXTX5I Index']
     bloomberg = grau_bloomberg(ativos, final_date=datetime.now(), timedelta=3650)
     print bloomberg.px_last()
 

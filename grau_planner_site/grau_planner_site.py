@@ -23,6 +23,7 @@ class grau_planner:
         self.driver.find_element_by_xpath('/html/body/form/table/tbody/tr/td/table/tbody/tr[1]/td/table/tbody/tr[5]/td/img').click()
         time.sleep(2)
 
+
     def caixa_carteiras(self, decimal_brasileiro=True, planner_id_index=False):
         self.driver.get('https://www.plannerbackoffice.com.br/WVDF_ACC_1/PSINT550_02Oracle.asp#')
         time.sleep(4)

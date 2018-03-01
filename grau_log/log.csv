@@ -1,0 +1,2 @@
+,horario,rotina,file,full_file,status,mensagem,linha_erro
+0,2018-01-31 11:50:50.444994,upload_prod,grau_papt.py,/usr/lib/python2.7/dist-packages/grau_project/grau_middleoffice/papt/grau_papt.py,ERRO,'module' object has no attribute 'error',16
